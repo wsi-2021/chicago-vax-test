@@ -8,4 +8,9 @@ router.get('/', function(req, res, next) {
   );
 });
 
+// Test out ability to serve JSON for an API
+router.get('/index.json', function(req, res, next) {
+  res.json({ title: 'OMG Express', greeting: 'Hello!' });
+});
+
 module.exports = router;
