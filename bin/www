@@ -6,7 +6,7 @@
 
 var app = require('../app');
 var debug = require('debug')('chicago-vax-test:server');
-var http = require('http');
+var fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
@@ -16,10 +16,19 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Check environment to see if key and certificate exist
+ * to serve HTTPS in production. If they don't, then just
+ * fall back to vanilla HTTP.
  */
-
-var server = http.createServer(app);
+if (process.env.LOCALHOST_SSL_KEY && process.env.LOCALHOST_SSL_CERT) {
+  var https = require('https');
+  var key = fs.readFileSync(process.env.LOCALHOST_SSL_KEY);
+  var cert = fs.readFileSync(process.env.LOCALHOST_SSL_CERT);
+  var server = https.createServer({key: key, cert: cert}, app);
+} else {
+  var http = require('http');
+  var server = http.createServer(app);
+}
 
 /**
  * Listen on provided port, on all network interfaces.
